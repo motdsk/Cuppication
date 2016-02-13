@@ -2,8 +2,8 @@
 void ReceiveData(unsigned long changeTime , boolean matome) {
   unsigned long t ;
   int i , cnt ;
-  lastlen=8;
-  AggregatebitLen=8;  //集約データを初期化
+  lastlen=16;
+  AggregatebitLen=16;  //集約データを初期化
   long beforeTime = millis();    //この時点での時刻を記録
   // 受信するまでループ
   while(1) {
@@ -74,10 +74,12 @@ void receive_Cognition(int num,char data[],boolean matome){
   //すべて0だった場合リクエスト判定
   //リクエスト信号だった場合自身の識別番号を送信する処理に移行
   //それ以外の場合はひたすら受信する
+  //最初の１バイトがFFだったばあいグループ情報として処理
   boolean reqest = false;
+  boolean group = false;
   int cnt0 = 0;
   int cnt1 = 0;
-  for(int i=0;i<num;i++){
+  for(int i=0;i<8;i++){
     if(data[i]==(char)0x30){//0または1の数をカウントする
       cnt0++;
     }
@@ -89,13 +91,20 @@ void receive_Cognition(int num,char data[],boolean matome){
   if(cnt0==ReqestbitLen && num==ReqestbitLen) {//内容がリクエストと一致したらリクエスト判定
     reqest=true;
   }
+  if(cnt1==8){  //グループ情報
+    group=true;
+  }
   if(reqest){
     Serial.println("Request received");          //リクエストを受け取りました
     delay(30*MyNum) ; //自分の識別番号＊30ミリ秒遅らせる
     SendData(MybitLen,MybitData) ;  // 自身の識別データを送信する
   }
+  else if(group){
+    Serial.println("GROUP received.") ;
+
+  }
   else{
-    Serial.println("Was received.") ;            // 受信しました
+  //  Serial.println("Was received.") ;            // 受信しました
 
     if(matome){
       //受信したデータと自身の識別番号をまとめて１つの配列に集約する処理
@@ -119,6 +128,9 @@ int bitData2int(char *data){
   }
   return dt;
 }
+
+
+
 
 
 

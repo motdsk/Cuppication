@@ -38,8 +38,11 @@ void setup(){
   IRbitLen = 0 ;
   LEDinit() ;      ///LEDの初期設定
   MyNum=bitData2int(MybitData);
-  for(int i=0; i < 8; i++ ){         //グループ情報をまとめる配列にあらかじめ自分の番号を格納しておく
-    AggregatebitData[i] = MybitData[i];
+  for(int i=0; i < 8; i++ ){         //グループ情報であることの証明に最初の１バイトをオール１にする
+    AggregatebitData[i] = one;
+  }
+  for(int i=8; i < 16; i++ ){         //グループ情報をまとめる配列にあらかじめ自分の番号を格納しておく
+    AggregatebitData[i] = MybitData[i-8];
   }
 }
 
