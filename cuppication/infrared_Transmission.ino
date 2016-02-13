@@ -16,9 +16,10 @@ void SendData(int num,char data[]){
   PalseHigh(HIGH_USEC) ;
   delayMicroseconds(STOP_USEC) ;
   offLED();//送信成功したらLEDリボンを消す処理
-  DspData(num,data) ;         // 表示する
- // Serial.println("Was transmissions.") ;  
+//  Serial.println("Was transmissions.") ;  
 }
+
+
 //  PalseHigh() - ＨＩＧＨのパルスを作る
 void PalseHigh(int cnt)
 {

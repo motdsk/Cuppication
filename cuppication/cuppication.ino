@@ -17,7 +17,7 @@
 char IRbitData[64] ;       // 受信データを格納する変数('0'/'1'で格納)
 int  IRbitLen ;            // 受信データの長さ
 char MybitData[8] = {
-  one,one,zero,zero,zero,zero,zero,zero}; //自身の個体識別データを定義
+  one,zero,zero,zero,zero,zero,zero,zero}; //自身の個体識別データを定義
 int  MybitLen = 8 ;             //自身の個体識別データの長さを定義
 char ReqestbitData[8] = {
   zero,zero,zero,zero,zero,zero,zero,zero}; //リクエスト信号を定義(おーる０)
@@ -29,6 +29,7 @@ int MyNum =0;                //自身の番号を１０進数で保存する変�
 char AggregatebitData[128] ;       // 受信データを集約して格納する変数('0'/'1'で格納)
 int  AggregatebitLen ;            // 集約データの長さ
 int lastlen=0;
+
 //最初に１度だけ実行される関数
 void setup(){
   Serial.begin(9600) ;               // シリアル通信の初期化
@@ -37,6 +38,9 @@ void setup(){
   IRbitLen = 0 ;
   LEDinit() ;      ///LEDの初期設定
   MyNum=bitData2int(MybitData);
+  for(int i=0; i < 8; i++ ){         //グループ情報をまとめる配列にあらかじめ自分の番号を格納しておく
+    AggregatebitData[i] = MybitData[i];
+  }
 }
 
 
@@ -47,13 +51,19 @@ void loop(){
 
   //実験用コード。リクエスト信号をのせた赤外線を送信する。
   SendData(ReqestbitLen,ReqestbitData) ;  // リクエスト送信する
-  Serial.println("reqest transmissions.") ;
-  ReceiveData(5000) ;    // 5秒間受信する
- // SendData(AggregatebitLen,AggregatebitData) ;  // 集約したデータを送信する。*この行は前の行で5秒間の間に受信した識別データをまとめてグルー日情報に変換、周りに送信する。
+  Serial.println("-------------I send  reqest----------") ;
+  ReceiveData(5000,true) ;    // 5秒間受信する
+
+
+  Serial.println("-------------aggregated--------------------") ;
+  SendData(AggregatebitLen,AggregatebitData) ;  // 集約したデータを送信する。*この行は前の行で5秒間の間に受信した識別データをまとめてグルー日情報に変換、周りに送信する。
   DspData(AggregatebitLen,AggregatebitData) ; 
-  Serial.println("aggregated") ;
-  ReceiveData(10000);   //次のターンまで受信
+ 
+
+ Serial.println("--------------receive only------------------") ;
+  ReceiveData(10000,false);   //次のターンまで受信
 }
+
 
 
 

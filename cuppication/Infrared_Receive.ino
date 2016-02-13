@@ -1,9 +1,9 @@
 ///////////////////////////////// 赤外線を受信する処理
-void ReceiveData(unsigned long changeTime) {
+void ReceiveData(unsigned long changeTime , boolean matome) {
   unsigned long t ;
   int i , cnt ;
-  lastlen=0;
-  AggregatebitLen=0;  //集約データを初期化
+  lastlen=8;
+  AggregatebitLen=8;  //集約データを初期化
   long beforeTime = millis();    //この時点での時刻を記録
   // 受信するまでループ
   while(1) {
@@ -39,8 +39,8 @@ void ReceiveData(unsigned long changeTime) {
       if (i != 0){
         IRbitData[i] = 0 ;
         IRbitLen     = i ;
-        DspData(IRbitLen,IRbitData) ;         // 表示する
-        receive_Cognition(IRbitLen,IRbitData); //リクエスト信号なら返す、それ以外ならただ保存するという処理
+        DspData(IRbitLen,IRbitData);         // 表示する
+        receive_Cognition(IRbitLen,IRbitData,matome); //リクエスト信号なら返す、それ以外ならただ保存するという処理
       }
     }
     //受信開始してからchangeTimeミリ秒経過したらループ抜けする
@@ -70,7 +70,7 @@ void DspData(int num,char data[]){
 }
 
 
-void receive_Cognition(int num,char data[]){
+void receive_Cognition(int num,char data[],boolean matome){
   //すべて0だった場合リクエスト判定
   //リクエスト信号だった場合自身の識別番号を送信する処理に移行
   //それ以外の場合はひたすら受信する
@@ -97,7 +97,7 @@ void receive_Cognition(int num,char data[]){
   else{
     Serial.println("Was received.") ;            // 受信しました
 
-    
+    if(matome){
       //受信したデータと自身の識別番号をまとめて１つの配列に集約する処理
       //後にこれをグループ情報として送信する
       for(int i=lastlen; i < num+lastlen; i++ ){ //順々に配列の後尾に値を格納していく
@@ -107,7 +107,7 @@ void receive_Cognition(int num,char data[]){
       }
       lastlen+=num;      //次回後ろに追加していくため今回のビットデータの長さを保存 
       AggregatebitData[AggregatebitLen]=0; //文字列配列の最後にヌル文字（０）を挿入して終了
-    
+    }
   }
 }
 
