@@ -23,7 +23,7 @@ void LEDinit(){  //LEDリボンinit
 void setLEDintensity(int LEDpos, int LEDval) {
   LEDcolorR[LEDpos]=255; //LEDval;
   LEDcolorG[LEDpos]=255; //LEDval;
-  LEDcolorB[LEDpos]=0; //LEDval;
+  LEDcolorB[LEDpos]=255; //LEDval;
 }
 
 void setLED(boolean a){
